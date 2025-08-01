@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .dashboard-wrapper {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    form {
+        margin-top: 20px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+    }
+
+    input, button {
+        padding: 6px 12px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    h2, h3, p {
+        margin-top: 20px;
+    }
+
+    .charts-container {
+        display: flex;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        gap: 20px;
+        margin-top: 20px;
+    }
+
+    canvas {
+        flex: 1 1 45%;
+        max-width: 100%;
+        max-height: 300px;
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 0.95rem;
+    }
+
+    table, th, td {
+        border: 1px solid #ccc;
+    }
+
+    th, td {
+        padding: 10px;
+        text-align: center;
+    }
+
+    th {
+        background-color: #3a3a9f;
+    }
+
+    a {
+        text-decoration: none;
+        color: #ffd700;
+    }
+</style>
+
+<div class="dashboard-wrapper">
+
+    <a href="{{ url_for('main.add_expense') }}">➕ Add New Expense</a>
+
+    <!-- 🔍 Filter Form -->
+    <form method="GET" action="{{ url_for('main.index') }}">
+        <input type="text" name="desc" placeholder="Search description">
+        <input type="text" name="category" placeholder="Category">
+        <input type="date" name="from_date">
+        <input type="date" name="to_date">
+        <button type="submit">Filter</button>
+    </form>
+
+    <!-- 💡 Insights -->
+    <h2>Total: ₹{{ total }}</h2>
+    <p><strong>Top Category:</strong> {{ top_category }}</p>
+    <p><strong>Total This Month:</strong> ₹{{ total_this_month }}</p>
+
+    <!-- 📊 Charts Side-by-Side -->
+    <div class="charts-container">
+        <div>
+            <h3>Expenses by Category</h3>
+            <canvas id="categoryChart"
+                    data-labels='{{ category_labels|safe }}'
+                    data-totals='{{ category_totals|safe }}'>
+            </canvas>
+        </div>
+        <div>
+            <h3>Monthly Spending</h3>
+            <canvas id="monthlyChart"
+                    data-labels='{{ month_labels|safe }}'
+                    data-totals='{{ month_totals|safe }}'>
+            </canvas>
+        </div>
+    </div>
+
+    <div class="toggle-expense-view mb-4">
+  <a href="{{ url_for('main.index', show='last10') }}" class="btn btn-sm {{ 'btn-primary' if request.args.get('show', 'last10') != 'all' else 'btn-outline-primary' }}">Last 10 Expenses</a>
+  <a href="{{ url_for('main.index', show='all') }}" class="btn btn-sm {{ 'btn-primary' if request.args.get('show') == 'all' else 'btn-outline-primary' }}">All Expenses</a>
+</div>
+
+
+    <!-- 📋 Table -->
+    <h3>Expense Entries</h3>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Description</th>
+            <th>Category</th>
+            <th>Amount</th>
+            <th>Actions</th>
+        </tr>
+        {% for e in expenses %}
+        <tr>
+            <td>{{ e.date }}</td>
+            <td>{{ e.description }}</td>
+            <td>{{ e.category }}</td>
+            <td>{{ e.amount }}</td>
+            <td>
+                <a href="{{ url_for('main.edit_expense', id=e.id) }}">Edit</a> |
+                <a href="{{ url_for('main.delete_expense', id=e.id) }}">Delete</a>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+</div>
+
+<!-- Load Chart.js and your external chart script -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="../static/js/charts.js"></script>
+
+{% endblock %}

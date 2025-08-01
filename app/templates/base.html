@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Expense Tracker</title>
+    <style>
+        body {
+            background-color: #2c003e; /* Royal violet */
+            color: #ffd700; /* Gold */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 30px;
+            background-color: #3c005a;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #ffd700;
+        }
+
+        ul {
+            list-style: none;
+            padding: 0;
+            margin: 10px 0;
+        }
+
+        ul li {
+            background: #ffd700;
+            color: #2c003e;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 5px;
+        }
+
+        a {
+            color: #ffd700;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        a:hover {
+            text-decoration: underline;
+            color: #fff59d;
+        }
+
+        hr {
+            border: none;
+            border-top: 1px solid #ffd700;
+            margin: 20px 0;
+        }
+
+        p {
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Expense Tracker</h1>
+
+        {% with messages = get_flashed_messages() %}
+          {% if messages %}
+            <ul>{% for msg in messages %}<li>{{ msg }}</li>{% endfor %}</ul>
+          {% endif %}
+        {% endwith %}
+
+        {% if current_user.is_authenticated %}
+          <p>Hello, {{ current_user.username }} |
+            <a href="{{ url_for('auth.logout') }}">Logout</a></p>
+        {% endif %}
+
+        <hr>
+
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
